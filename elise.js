@@ -1,6 +1,6 @@
 'use strict'
 
-/* Common Helpers */
+/* Common */
 const log = console.log
 const { readFileSync, writeFileSync } = require('fs')
 const read = path => readFileSync(path, 'utf8')
@@ -8,7 +8,7 @@ const write = (path, content) => writeFileSync(path, content, 'utf8')
 const range = (from, to, by=1) => [...Array(to - from + 1).keys()].map((_, i) => i + from).filter(n => n % by == 0);
 
 
-/* ATBASH Cipher */
+/* ================== ATBASH Cipher ================== */
 const rindex = (c, key) => key.length - key.indexOf(c) - 1
 const atbash = (text, key) => text.toUpperCase().split("").map(c => key[rindex(c, key)] || c).join("")
 
@@ -23,7 +23,9 @@ let haword = "לב קמי"
 log(eaword, "=>", atbash(eaword, alphabets.english))
 log(haword, "=>", atbash(haword, alphabets.hebrew))
 
-/* Gematria/Isopsephy */
+
+
+/* ================== GEMATRIA / ISOPSEPHY ================== */
 const alphabet = (length, offset) => range(1, length).map(n => String.fromCodePoint(n + offset))
 const except = (list, indices) => list.filter((_, n) => indices.indexOf(n) == -1)
 const zip = (ks, vs) => ks.reduce((o, k, n) => {o[k] = vs[n]; return o;}, {})
@@ -54,7 +56,7 @@ twords.map(w => log(w, "=", gematria(w)))
 
 
 
-/* ELS Sequencing */
+/* ================== EQUIDISTANT LETTER SEQUENCING ================== */
 const reverse = text => text.split('').reverse().join('')
 const els = (text, skip) => text.split('').filter((_, n) => n % skip == 0).join('')
 const sequence = text => range(1, text.length - 1).map(n => ({skip: n, text: els(text, n)}))
@@ -97,19 +99,7 @@ log('Isaiah chapter 53, starting at the 508th letter, skpping every 20 letters:'
 els(reverse(I53.substr(0, 507)), 20).substr(0, 7))
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-/* HNV Linear Correlation */
+/* ================== LOG(N) HNV LINEAR CORRELATION ================== */
 const logn = value => Math.log(value)
 const mean = ns => sum(ns) / ns.length
 
@@ -154,10 +144,72 @@ let diametersEng = [
     {word: "Sun", trans: "Sun", value: 1392000.0}
 ]
 
-let iceCreamSales = {
-    temps: [14.2, 16.4, 11.9, 15.2, 18.5, 22.1, 19.4, 25.1, 23.4, 18.1, 22.6, 17.2],
-    sales: [215, 325, 185, 332, 406, 522, 412, 614, 544, 421, 445, 408]
-}
+// plot(toHNVdata(diameters, diametersEng))
 
-// log(correlate(iceCreamSales.temps, iceCreamSales.sales))
-plot(toHNVdata(diameters, diametersEng))
+
+/* ================== BIBLE WHEEL ================== */
+const letters = alphabets.hebrew.split('')
+
+const books = [
+    "GEN","EXO","LEV","NUM","DEU",
+    "JOS","JDG","RUT","1SA","2SA","1KI","2KI","1CH","2CH","EZR","NEH","EST",
+    "JOB","PSA","PRO","ECC","SOS",
+    "ISA","JER","LAM","EZE","DAN",
+    "HOS","JOE","AMO","OBA","JON","MIC","NAH","HAB","ZEP","HAG","ZEC","MAL",
+    "MAT","MAR","LUK","JOH",
+    "ACT","ROM",
+    "1CO","2CO",
+    "GAL","EPH","PHI","COL",
+    "1TH","2TH","1TI","2TI","TIT",
+    "PHL","HEB","JAM","1PE","2PE",
+    "1JO","2JO","3JO","JUD","REV"
+]
+
+const wheel = range(0, 65).map(n => ({
+    number: n + 1, 
+    letter: letters[n % 22],
+    book: books[n],
+    spoke: (n % 22) + 1,
+    cycle: Math.ceil((n + 1) / 22)
+}))
+
+const single = xs => xs[0] || null
+const sliceBy = (slicer, prop, value) => wheel.filter(e => e[slicer] == value).map(e => e[prop])
+const byBook = sliceBy.bind(this, 'book')
+const bySpoke = sliceBy.bind(this, 'spoke')
+const byCycle = sliceBy.bind(this, 'cycle')
+const byLetter = sliceBy.bind(this, 'letter')
+
+const spoke = spoke => single(byBook('spoke', spoke))
+const cycle = cycle => single(byBook('cycle', cycle))
+const letter = letter => single(byBook('letter', letter))
+
+const spokeBooks = bySpoke.bind(this, 'book')
+const cycleBooks = byCycle.bind(this, 'book')
+const letterBooks = byLetter.bind(this, 'book')
+
+const bookBy = (slice1, slice2, prop, value1, value2) => wheel.find(e => e[slice1] == value1 && e[slice2] == value2)[prop]
+const bookBySpokeCycle = bookBy.bind(this, 'spoke', 'cycle', 'book')
+const bookByLetterCycle = bookBy.bind(this, 'letter', 'cycle', 'book')
+const otherSpokeBooks = book => spokeBooks(spoke(book)).filter(b => b != book)
+
+// log(wheel)
+log(spoke('HEB'))
+log(cycle('HEB'))
+log(spokeBooks(1))
+log(letterBooks('ב'))
+log(cycleBooks(3).toString())
+log(otherSpokeBooks('ROM'))
+log(bookBySpokeCycle(2, 3))
+log(bookByLetterCycle('ב', 3))
+
+const ref = verse => verse.replace(/^([A-Z0-9]{2}) (\d+)\:(\d+)(.*)$/gi, "$1 $2:$3")
+const findVerse = (verse, word) => verse.indexOf(word) != -1 ? ref(verse) : false
+const verseByVersion = (ref, version) => matchLines(lines(`${version}.txt`), new RegExp(ref + ' ', 'i'))
+
+// log(verseByVersion('GE 1:1', 'WLC'))
+// log(verseByVersion('GE 1:1', 'KJV'))
+
+// let w = "בָּרָ֣א"
+// const vs = lines("WLC.txt").map(l => `${ref(l)} ${l}`)
+// const mvs = vs.filter(v => findVerse(v, w))
