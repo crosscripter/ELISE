@@ -1,25 +1,126 @@
 'use strict'
 
-/* Common */
-const log = console.log
+/*==================================================================================================================================\
+|                  E. L. I. S. E                                                                                                   |
+| :: Equidistant Letter Interval Sequencing Engine ::                                                                              |
+|                  Version 1.0.0                                                                                                   |
+|      Copyright (R) @crosscripter, 2018-2019                                                                                      |
+|                                                                                                                                  |
+| Usage: $ node elise.js <mode:ATB|GEM|ELS|HNV|BWH> <inputs..>                                                                     |
+|                                                                                                                                  |
+| =================== MODES ========================================================================================================
+|                                                                                                                                  |
+|  1. ATB  (Atbash Ciphering)                                                                                                      |
+|  $ node elise.js ATB "Text to cipher" <key:ENG|LAT|HEB|GRK|"CUSTOMCIPHERKEY">                                                    |
+|  Runs the atbash cipher on the input text, using the given key, prints out the ciphered text.                                    |
+|                                                                                                                                  |
+|  2. GEM (Hebrew Gematria/Greek Isopsephy)                                                                                        |
+|  $ node elise.js GEM "Word or phrase" [<key:ENG|LAT|HEB|GRK|{"Custom":0}>]                                                       |
+|  Sums up a given word or phrase using the Gematria value key given, prints out the word and value.                               |
+|                                                                                                                                  |
+|  3. ELS (Equidistant Letter Sequencing)                                                                                          |
+|  $ node elise.js ELS "path/to/source.txt" "terms,to,sarch,for" [minSkip:0] [maxSkip:L] [start:0] [stop:L] ["path/to/grid.html"]  |
+|  Runs ELS sequencing on the source text from star to stop, skipping from min to maxSkip looking for terms.                       |
+|  Exports a list of hits and an optional HTML grid file (Defaults to ./grid.html)                                                 |
+|                                                                                                                                  |
+|  4. HNV (Log(N) Hebrew Numeric Value Linear Correlation)                                                                         |
+|  $ node elise.js HNV "word=value,wordN=valueN;group2=value,group2=value,group2=value" "unit name" ["path/to/graph.html"]         |
+|  Runs Dr. Haim Shore's HNV Linear Correlation between the unit values and the HNV (Gematria) values on the scale of Log(N).      |
+|  Graphs the corresponding datapoints and calculates the correlation using the Pearsons Moment-Product Correlation Coefficent.    |
+|  Exports the correlation graph to the path given.                                                                                |
+|                                                                                                                                  |
+|  5. BWH (Bible Wheel KeyLink Search)                                                                                             |
+|  $ node elise.js BWH "Words,to,Search,For"                                                                                       |
+|  Models the Bible Wheel structure and searches across spokes/cycles and letter symbolism for keylinks.                           |
+|  Displays results in a list on the screen.                                                                                       |
+|                                                                                                                                  |
+\=================================================================================================================================*/
+
+
+
+
+// Imports the fs read/write file methods
 const { readFileSync, writeFileSync } = require('fs')
+
+// Wrappers around fs read/write to simplify and abstract away encoding
 const read = path => readFileSync(path, 'utf8')
 const write = (path, content) => writeFileSync(path, content, 'utf8')
+
+
+
+/* =================================================== Common Helper Functions ================================================== */
+
+// Wrapper for the console.log method, used for conciseness
+// Single method for browser overrides as well (IE)
+const log = console.log
+
+// Utility function used by almost every mode in the engine.
+// Produces a range from two integers (from and to) inclusive.
+// Takes an optional by parameter as the step for each generation
 const range = (from, to, by=1) => [...Array(to - from + 1).keys()].map((_, i) => i + from).filter(n => n % by == 0);
 
 
-/* ================== ATBASH Cipher ================== */
+
+
+/* ======================================================= ATBASH Cipher ======================================================= 
+Atbash is a simple cipher in which one transposes the given key such that the first and last letters are set equivalent, and the
+second to last and second letter and so on etc.  So in the Latin/English key: A => Z and Z => A, B => Y and Y => B etc.  We see
+an example of the latin key below:
+
+                            1                    2
+INDEX:  0 1 2 3 4 5 6 7 8 9 0 1 2  3 4 5 6 7 8 9 0 1 2 3 4 5
+ENG:    A B C D E F G H I J K L M  N O P Q R S T U V W X Y Z
+ATB:    Z Y X W V U T S R Q P O N  M L K J I H G F E D C B A
+        
+This transposition of the letters is equivalent and may be represented by the following function:
+
+    N = (L - I) - 1
+
+Where L is the length of the key
+      N is the new index of a given character in the atbash tranposition
+      I is the index of a given character in the key
+
+Thus we encode the English text "Hello World!" as "SVOOL DLIOW!"
+Therefore the character 'H' index is 7 and the equivalent atbash character is 'S'
+Hence to transpose or encipher:
+
+    H at index 7 is 'H'
+
+    L = 26 (Length of key, 0-25, but 26 characters total)
+    N = (26 - 7) - 1 => (19) - 1 => 18
+
+    therefore, N at index 18 is 'S'
+    and to reverse the transposition or decipher:
+
+    S at index 18 is 'S'
+
+    L = 26
+    N = (26 - 18) - 1 => (8) - 1 => 7
+
+    Therefore, N at index 7 is 'H'
+*/
+
+// Calculates the reverse index of a given character c within a given string of text, or key
 const rindex = (c, key) => key.length - key.indexOf(c) - 1
+
+// Formats the given text enciphers or transposes the text character by character using the Atbash cipher using the given key.
 const atbash = (text, key) => text.toUpperCase().split("").map(c => key[rindex(c, key)] || c).join("")
 
+// Predefined Atbash "Alphabets" or keys. Two are defined for use, the English and Hebrew alphabets, respectively.
 const alphabets = {
-  english: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-  hebrew: "אבגדהוזחטיכלמנסעפצקרשת"
+    english: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+    hebrew: "אבגדהוזחטיכלמנסעפצקרשת"
 }
 
 log("================ ATBASH ====================");
+
+// English for my name
 let eaword = "Michael Schutt"
+
+// Hebrew phrase "Leb Kamai" found in Jeremiah, which is Atbash enciphered text for "Chasdim" (or Chaldeans)
 let haword = "לב קמי"
+
+// Display the enciphered words
 log(eaword, "=>", atbash(eaword, alphabets.english))
 log(haword, "=>", atbash(haword, alphabets.hebrew))
 
@@ -78,8 +179,8 @@ const unfinalize = text => {
 const format = text => unfinalize(unpoint(text))
 const text = lines => lines.map(format).join('')
 const matchLines = (lines, pattern) => lines.filter(l => pattern.test(l))
-const book = book => matchLines(lines("WLC.txt"), new RegExp(`^${book}`))
-const chapter = (book, chapter) => matchLines(lines("WLC.txt"), new RegExp(`^${book} ${chapter}\:`))
+const book = (book, version='WLC') => matchLines(lines(`${version}.txt`), new RegExp(`^${book}`, 'i'))
+const chapter = (book, chapter, version='WLC') => matchLines(lines(`${version}.txt`), new RegExp(`^${book} ${chapter}\:`, 'i'))
 
 log("================ ELS ====================");
 let terms = ["ACE"]
@@ -193,7 +294,7 @@ const bookBySpokeCycle = bookBy.bind(this, 'spoke', 'cycle', 'book')
 const bookByLetterCycle = bookBy.bind(this, 'letter', 'cycle', 'book')
 const otherSpokeBooks = book => spokeBooks(spoke(book)).filter(b => b != book)
 
-// log(wheel)
+log(wheel)
 log(spoke('HEB'))
 log(cycle('HEB'))
 log(spokeBooks(1))
@@ -203,13 +304,26 @@ log(otherSpokeBooks('ROM'))
 log(bookBySpokeCycle(2, 3))
 log(bookByLetterCycle('ב', 3))
 
+const stripVowels = text => text.replace(/[^א-ת ]/g, '')
 const ref = verse => verse.replace(/^([A-Z0-9]{2}) (\d+)\:(\d+)(.*)$/gi, "$1 $2:$3")
-const findVerse = (verse, word) => verse.indexOf(word) != -1 ? ref(verse) : false
+const findVerse = (verse, word) => new RegExp(` ${word} `).test(verse) ? ref(verse) : false
 const verseByVersion = (ref, version) => matchLines(lines(`${version}.txt`), new RegExp(ref + ' ', 'i'))
 
-// log(verseByVersion('GE 1:1', 'WLC'))
-// log(verseByVersion('GE 1:1', 'KJV'))
+log(verseByVersion('GE 1:1', 'WLC'))
+log(verseByVersion('GE 1:1', 'KJV'))
 
-// let w = "בָּרָ֣א"
-// const vs = lines("WLC.txt").map(l => `${ref(l)} ${l}`)
-// const mvs = vs.filter(v => findVerse(v, w))
+let hw = stripVowels("בָּרָ֣א")
+const hvs = lines("WLC.txt").map(l => `${ref(l)}${stripVowels(l)}`)
+
+const mhvs = hvs.map(v => ({h: v, r: findVerse(v, hw)}))
+                .filter(x => x.r)
+                .map(x => `${x.h}  ${verseByVersion(x.r, 'KJV')}`)
+
+log(mhvs)
+
+
+// Globally exposed ELISE engine functionality
+module.exports = {
+    log: log,
+    range: range
+}
