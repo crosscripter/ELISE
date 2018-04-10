@@ -1,5 +1,6 @@
 "use strict"
 const { log, range, read } = require("./core")
+const { normalize } = require("./gematria")
 
 /* ================== EQUIDISTANT LETTER SEQUENCING ================== 
 Equidistant letter sequencing is the act of skipping equal number of letters
@@ -49,8 +50,9 @@ verify them.
 // Utility function to reverse a string of text
 const reverse = text => text.split('').reverse().join('')
 
-// Skips a given number of letters (skip) in a given text and returns the new text.
+// Skips a given number of letters (skip) in a given text building a skip text sequence.
 const skip = (text, skip) => text.split('').filter((_, n) => n % skip == 0).join('')
+// const skip = (text, skip) => text.split('').filter((c, x) => x % skip == 0 ? c : '').join('')
 
 // Runs the skip sequence for a possible skips on a given text
 // returns a list of sequences in the form {skip, text}
@@ -58,10 +60,17 @@ const sequence = text => range(1, text.length - 1).map(n => ({skip: n, text: ski
 
 const find = (text, term) => range(0, text.length - 1).filter(n => text.indexOf(term, n) == n)
 
-const search = (text, term) => sequence(text)
-    .map(s => ({seq: s, indices: find(s.text, term)}))
-    .filter(s => s.indices.length > 0)
-    .map(s => `Skipping ${s.seq.skip} at ${s.indices} in ${s.indices.map(i => s.seq.text.substr(i - 10, i + 10)).join(',')}`)
+// Calculates all indices of a given term in a given text
+const indicesOf = (text, term) => text
+    .split('')
+    .map((_, n) => text.substr(n))
+    .map((s, n) => s.substr(0, term.length) == term ? n : -1)
+    .filter(x => x != -1)
+
+// const search = (text, term) => sequence(text)
+//     .map(s => ({seq: s, indices: find(s.text, term)}))
+//     .filter(s => s.indices.length > 0)
+//     .map(s => `Skipping ${s.seq.skip} at ${s.indices} in ${s.indices.map(i => s.seq.text.substr(i - 10, i + 10)).join(',')}`)
 
 const lines = path => read(path).split(/\r\n/g)
 const unpoint = text => text.replace(/[^א-ת]/g, '')
@@ -77,20 +86,56 @@ const matchLines = (lines, pattern) => lines.filter(l => pattern.test(l))
 const book = (book, version='WLC') => matchLines(lines(`${version}.txt`), new RegExp(`^${book}`, 'i'))
 const chapter = (book, chapter, version='WLC') => matchLines(lines(`${version}.txt`), new RegExp(`^${book} ${chapter}\:`, 'i'))
 
-// let terms = ["ACE"]
-// let stext = "ABCDEFGHIJKLMNOPQRSTUVWXYZ" // read("GE1.txt", "utf8").replace(/[^A-Z]/gi, '').toUpperCase()
-// let seq = sequence(stext)[1].text
-// log(`Term ${terms[0]} found in sequence ${seq.substr(0, 30)}... at index ${find(seq, terms[0])}`)
+// Calculates the all the letter indices of a given word at a given index with a given skip.
+const skipIndices = (word, index, skip) => word.split('').map((_, n) => (n + index) * skip)
 
-// const G = text(book("GE"))
-// const I53 = text(chapter("ISA", 53))
+// Flattens an array of arrays into a single array
+const flatten = aas => aas.reduce((a, b, _, r) => a.concat(...b), [])
 
-// // GE 1 (5) x 50 = תורה
-// log ('Genesis chapter 1, starting at the 6th letter, skipping every 50 letters:', 
-// skip(G.substr(5), 50).substr(0, 4))
+// Produces a text grid with highlighted letters at the given indices of a given width.
+const grid = (text, indices, width=0) => text
+    .split('')
+    .map((c, n) => ~indices.indexOf(n) ? `[${c}]` : ` ${c} `)
+    .map((c, n) => n % width == 0 ? `\n${c}` : c)
+    .join('')
 
-// // ISA 53 (507) x 20 = ישוע שמי
-// log('Isaiah chapter 53, starting at the 508th letter, skpping every 20 letters:', 
-// skip(reverse(I53.substr(0, 507)), 20).substr(0, 7))
+// Runs an ELS search at skip interval given on text given for the term given
+// and returns a text grid of the results.
+const search = (text, interval, term, width=0) => {
+    let source = normalize(text)    
+    let seq = skip(source, interval)
+    let ns = indicesOf(seq, term)
+    let iis = ns.map(n => skipIndices(term, n, interval))
+    let fs = flatten(iis)
+    return grid(source, fs, width)
+}
 
-module.exports = { skip, lines, matchLines, format }
+const G = text(book("GE"))
+const I53 = text(chapter("ISA", 53))
+
+let test = () => {
+
+    let terms = ["ACE"]
+    let stext = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    let seq = sequence(stext)[1].text
+    log(`Term ${terms[0]} found in sequence ${seq.substr(0, 30)}... at index ${find(seq, terms[0])}`)
+
+    // GE 1 (5) x 50 = תורה
+    log ('Genesis chapter 1, starting at the 6th letter, skipping every 50 letters:', 
+    skip(G.substr(5), 50).substr(0, 4))
+    log("==============================================")
+    log(search(G.substr(5), 50, "תורה", 38).substr(0, 500))
+
+    // ISA 53 (507) x 20 = ישוע שמי
+    let IT = reverse(I53.substr(0, 507))
+    log('Isaiah chapter 53, starting at the 508th letter, skpping every 20 letters:', 
+    skip(IT, 20).substr(0, 7))
+    log("==============================================")
+    log(search(IT, 20, "ישועשמי", 20).substr(0, 500))
+
+    let etext = read("KJV.txt").substr(0, 1000)
+    log(search(etext, 3, "NOAH", 18).substr(0, 800))
+}
+
+module.exports = { skip, lines, matchLines, format, test, G, I53 }
+// test()
