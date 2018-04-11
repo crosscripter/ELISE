@@ -44,7 +44,8 @@ Therefore, N at index 7 is 'H'
 // Two are defined for use, the English and Hebrew alphabets, respectively.
 const alphabets = { 
     english: "ABCDEFGHIJKLMNOPQRSTUVWXYZ", 
-    hebrew: "אבגדהוזחטיכלמנסעפצקרשת" 
+    hebrew: "אבגדהוזחטיכלמנסעפצקרשת",
+    greek: "ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ"
 }
 
 // Calculates the reverse index of a given character c within a given string of text, or key
@@ -66,6 +67,10 @@ let eaword = "Michael Schutt"
 // which is Atbash enciphered text for "Chasdim" (or Chaldeans)
 let haword = "לב קמי"
 
+const { normalize } = require("./gematria")
+let gword = normalize("Ἰησοῦς")
+
 // Display the enciphered words
 log(eaword, "=>", atbash(eaword, alphabets.english))
 log(haword, "=>", atbash(haword, alphabets.hebrew))
+log(gword, '=>', atbash(gword, alphabets.greek))

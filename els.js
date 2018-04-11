@@ -74,6 +74,7 @@ const indicesOf = (text, term) => text
 //     .map(s => `Skipping ${s.seq.skip} at ${s.indices} in ${s.indices.map(i => s.seq.text.substr(i - 10, i + 10)).join(',')}`)
 
 const lines = path => read(path).split(new RegExp(EOL, 'g')) // (\r\n|\r|\n)/g)
+const words = text => text.split(' ').filter(x => x)
 const unpoint = text => text.replace(/[^א-ת]/g, '')
 const unfinalize = text => {
     const finals = {'ך':'כ', 'ם':'מ', 'ן':'נ', 'ף':'פ', 'ץ':'צ'}
@@ -114,7 +115,7 @@ const search = (text, interval, term, width=0) => {
 const G = text(book("GE"))
 const I53 = text(chapter("ISA", 53))
 
-module.exports = { skip, lines, matchLines, format, G, I53 }
+module.exports = { skip, lines, words, text, chapter, matchLines, format, G, I53 }
 
 // Unit testing
 if (require.main != module) return

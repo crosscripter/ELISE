@@ -53,7 +53,7 @@ const ref = verse => verse.replace(/^([A-Z0-9]{2}) (\d+)\:(\d+)(.*)$/gi, "$1 $2:
 const findVerse = (verse, word) => new RegExp(` ${word} `).test(verse) ? ref(verse) : false
 const verseByVersion = (ref, version) => matchLines(lines(`${version}.txt`), new RegExp(ref + ' ', 'i'))
 
-module.exports = { wheel }
+module.exports = { wheel, stripVowels }
 
 // Unit testing
 if (require.main != module) return

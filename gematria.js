@@ -37,7 +37,7 @@ const key = ranges => ranges.reduce((a, b) => a.concat(range(b[0], b[1], b[2] ||
 
 // Preset Gematria keys by alphabet/language
 const keys = {
-    latin: zip(alphabet(26, 64), key([[1,9],[600,600],[10,90,10],[100,200,100],[700,700],[900,900],[300,500,100]])),
+    english: zip(alphabet(26, 64), key([[1,9],[600,600],[10,90,10],[100,200,100],[700,700],[900,900],[300,500,100]])),
     hebrew: zip(except(alphabet(27, 1487), [10,13,15,19,21]), key([[1,9],[10,90,10],[100,400,100]])),
     greek: zip(except(alphabet(25, 912), [17]), key([[1,5],[7,9],[10,80,10],[100,800,100]]))
 }
@@ -62,7 +62,7 @@ const lang = word => Object.keys(keys).find(k => Object.keys(keys[k]).indexOf(no
 // Main function, given a word, auto detects key to use and calculates the corresponding gematria value.
 const gematria = word => value(word, keys[lang(word)])
 
-module.exports = { gematria, normalize }
+module.exports = { gematria, normalize, alphabet, lang }
 
 // Unit testing
 if (require.main != module) return
@@ -75,3 +75,6 @@ log('==', gematria(gtext))
 
 let words = ["JESUS", "יֵשׁוּעַ", "Ἰησοῦς"]
 words.map(w => log(w, "=", gematria(w)))
+
+
+log(Object.keys(keys.greek).join(''))

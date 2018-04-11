@@ -159,4 +159,4 @@ let diametersEng = [
 ]
 
 // Convert inputs to HNV data format and plot
-plot(toHNVdata(diameters, diametersEng), true)
+plot(toHNVdata(diameters, diametersEng))
