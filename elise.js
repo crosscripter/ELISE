@@ -38,8 +38,15 @@
 
 // Import transformation modules
 const { log, range, read, write } = require("./core")
+const { random, choice, permute } = require("./random")
+const { KJV, STR, WLC, original } = require("./sources")
 const { atbash, alphabets } = require("./atbash")
 const { gematria } = require("./gematria")
 const { els } = require("./els")
 const { plot } = require("./hnv")
 const { wheel } = require("./wheel")
+
+// Run all modules and test them!
+const { fork } = require("child_process")
+let modules = ["core", "random", "sources", "atbash", "gematria", "els", "hnv", "wheel"]
+modules.forEach(m => fork(`./${m}`))

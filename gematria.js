@@ -52,6 +52,9 @@ const clean = text => text.replace(/[^A-ZΑ-Ωא-ת]/g, '')
 // Normalizes text by cleaning and unaccenting the text given.
 const normalize = text => clean(unaccent(text.toUpperCase()))
 
+// Split a given text up by words
+const words = text => text.split(' ').filter(x => x)
+
 // Calculate the gematria value of a given word based on the given key.
 // NOTE: All letters not found in the key are assigned the value 0 by default.
 const value = (word, key) => sum(normalize(word).split('').map(c => key[c] || 0))
@@ -62,19 +65,16 @@ const lang = word => Object.keys(keys).find(k => Object.keys(keys[k]).indexOf(no
 // Main function, given a word, auto detects key to use and calculates the corresponding gematria value.
 const gematria = word => value(word, keys[lang(word)])
 
-module.exports = { gematria, normalize, alphabet, lang }
+module.exports = { gematria, normalize, words, alphabet, lang }
 
 // Unit testing
 if (require.main != module) return
 log("============== GEMATRIA ================")
+const { chapter, text, WLC } = require("./sources")
 
-let gtext = read("GE1.txt")
-let verses = gtext.split(/\r\n/g)
-verses.forEach(v => { log(v.split(/ /g).map(w => `${w} (${gematria(w)})`).join(' '), '=', gematria(v)) })
-log('==', gematria(gtext))
+let verses = chapter('Ge 1', WLC).map(text)
+verses.forEach(v => log(words(v).map(w => `${w} (${gematria(w)})`).join(' '), '=', gematria(v)))
+log('TOTAL: ', gematria(verses.join('')))
 
-let words = ["JESUS", "יֵשׁוּעַ", "Ἰησοῦς"]
-words.map(w => log(w, "=", gematria(w)))
-
-
-log(Object.keys(keys.greek).join(''))
+let ws = ["JESUS", "יֵשׁוּעַ", "Ἰησοῦς"]
+ws.map(w => log(w, "=", gematria(w)))

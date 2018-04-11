@@ -111,12 +111,12 @@ const correlate = (x, y) => {
 // Opens the graph up in the default browser and displays output.
 let displayGraph = () => {
     let start = (process.platform == 'darwin'? 'open': process.platform == 'win32'? 'start': 'xdg-open');
-    require('child_process').exec(`${start} LC.html`);
+    require('child_process').exec(`${start} ./output/graph.html`);
 }
 
 // This "plots" the data by writing the HNV data list to the "data.js" external javascript file.
 // This data is then passed into the graph template and renders the data visually in HTML.
-const plot = (data, display=false) => { write("data.js", data); log(data); display ? displayGraph() : null; }
+const plot = (data, display=false) => { write("./output/hnv-data.js", data); log(data); display ? displayGraph() : null; }
 
 // Convert a list inputs into a HNV data formatted nested array list.
 // Scales the data points using Log(N) and auto-calculates the gematria value

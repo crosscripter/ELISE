@@ -25,6 +25,8 @@ module.exports = { log, read, write, range, sum }
 // Unit testing
 if (require.main != module) return
 log("=============== CORE ================")
+const { KJV } = require("./sources")
+const { random, choice } = require("./random")
 
 log(1)
 log(1, 2)
@@ -32,7 +34,7 @@ log([1, 2])
 log({x: 1, y: 2})
 log(range(0, 10))
 log(range(0, 100, 2))
-log(read("KJV.txt").substr(0, 1000))
+log(KJV.substr(0, 1000))
 write("test.txt", "This is a test")
 log(sum(range(1,5)))
 log(range(0, 10).map(n => random(0, 1)).join(''))

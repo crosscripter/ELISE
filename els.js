@@ -1,7 +1,7 @@
 "use strict"
-const { EOL } = require("os")
-const { log, range, read } = require("./core")
 const { normalize } = require("./gematria")
+const { log, range, read } = require("./core")
+const { WLC, KJV, STR, text, book, chapter } = require("./sources")
 
 /* ================== EQUIDISTANT LETTER SEQUENCING ================== 
 Equidistant letter sequencing is the act of skipping equal number of letters
@@ -53,13 +53,10 @@ const reverse = text => text.split('').reverse().join('')
 
 // Skips a given number of letters (skip) in a given text building a skip text sequence.
 const skip = (text, skip) => text.split('').filter((_, n) => n % skip == 0).join('')
-// const skip = (text, skip) => text.split('').filter((c, x) => x % skip == 0 ? c : '').join('')
 
 // Runs the skip sequence for a possible skips on a given text
 // returns a list of sequences in the form {skip, text}
 const sequence = text => range(1, text.length - 1).map(n => ({skip: n, text: skip(text, n)}))
-
-const find = (text, term) => range(0, text.length - 1).filter(n => text.indexOf(term, n) == n)
 
 // Calculates all indices of a given term in a given text
 const indicesOf = (text, term) => text
@@ -68,25 +65,19 @@ const indicesOf = (text, term) => text
     .map((s, n) => s.substr(0, term.length) == term ? n : -1)
     .filter(x => x != -1)
 
-// const search = (text, term) => sequence(text)
-//     .map(s => ({seq: s, indices: find(s.text, term)}))
-//     .filter(s => s.indices.length > 0)
-//     .map(s => `Skipping ${s.seq.skip} at ${s.indices} in ${s.indices.map(i => s.seq.text.substr(i - 10, i + 10)).join(',')}`)
+const findAll = (text, term) => sequence(text)
+    .map(s => ({seq: s, indices: find(s.text, term)}))
+    .filter(s => s.indices.length > 0)
+    .map(s => `Skipping ${s.seq.skip} at ${s.indices} in ${s.indices.map(i => s.seq.text.substr(i - 10, i + 10)).join(',')}`)
 
-const lines = path => read(path).split(new RegExp(EOL, 'g')) // (\r\n|\r|\n)/g)
-const words = text => text.split(' ').filter(x => x)
-const unpoint = text => text.replace(/[^א-ת]/g, '')
 const unfinalize = text => {
     const finals = {'ך':'כ', 'ם':'מ', 'ן':'נ', 'ף':'פ', 'ץ':'צ'}
     Object.keys(finals).forEach(s => { text = text.replace(new RegExp(s, 'g'), finals[s]); })
     return text
 }
 
-const format = text => unfinalize(unpoint(text))
-const text = lines => lines.map(format).join('')
-const matchLines = (lines, pattern) => lines.filter(l => pattern.test(l))
-const book = (book, version='WLC') => matchLines(lines(`${version}.txt`), new RegExp(`^${book}`, 'i'))
-const chapter = (book, chapter, version='WLC') => matchLines(lines(`${version}.txt`), new RegExp(`^${book} ${chapter}\:`, 'i'))
+// Formats the text for ELS sequencing, removes final forms of the letters and normalizes diacritical vowels.
+const format = lines => lines.map(l => unfinalize(text(l))).map(normalize).join('')
 
 // Calculates the all the letter indices of a given word at a given index with a given skip.
 const skipIndices = (word, index, skip) => word.split('').map((_, n) => (n + index) * skip)
@@ -106,25 +97,25 @@ const grid = (text, indices, width=0) => text
 const search = (text, interval, term, width=0) => {
     let source = normalize(text)    
     let seq = skip(source, interval)
-    let ns = indicesOf(seq, term)
-    let iis = ns.map(n => skipIndices(term, n, interval))
+    let ns = indicesOf(seq, normalize(term))
+    let iis = ns.map(n => skipIndices(normalize(term), n, interval))
     let fs = flatten(iis)
     return grid(source, fs, width)
 }
 
-const G = text(book("GE"))
-const I53 = text(chapter("ISA", 53))
+const G = format(book('Ge', WLC))
+const I53 = format(chapter('Isa 53', WLC))
 
-module.exports = { skip, lines, words, text, chapter, matchLines, format, G, I53 }
+module.exports = { skip, format, G, I53 }
 
 // Unit testing
 if (require.main != module) return
 log("=========== ELS =========")
 
-let terms = ["ACE"]
-let stext = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-let seq = sequence(stext)[1].text
-log(`Term ${terms[0]} found in sequence ${seq.substr(0, 30)}... at index ${find(seq, terms[0])}`)
+// let terms = ["ACE"]
+// let stext = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+// let seq = sequence(stext)[1].text
+// log(`Term ${terms[0]} found in sequence ${seq.substr(0, 30)}... at index ${find(seq, terms[0])}`)
 
 // GE 1 (5) x 50 = תורה
 log ('Genesis chapter 1, starting at the 6th letter, skipping every 50 letters:', 
@@ -138,5 +129,8 @@ log('Isaiah chapter 53, starting at the 508th letter, skpping every 20 letters:'
 log("==============================================")
 log(search(IT, 20, "ישועשמי", 20).substr(0, 500))
 
-let etext = read("KJV.txt").substr(0, 1000)
-log(search(etext, 3, "NOAH", 18).substr(0, 800))
+let etext = format(chapter('Ge 1', KJV)).substr(0, 1000)
+log(search(etext, 1, "He", 18).substr(0, 800))
+
+let gtext = format(chapter('Mt 1', STR)).substr(0, 200)
+log(search(gtext, 1, "ΕΓΕΝΝΗΣΕΝ", 18))

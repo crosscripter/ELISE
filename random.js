@@ -1,8 +1,8 @@
 "use strict"
-const { alphabets } = require("./atbash")
+const { text } = require("./els")
 const { log, range } = require("./core")
-const { lang, alphabet } = require("./gematria")
-const { lines, chapter, text, words } = require("./els")
+const { alphabets } = require("./atbash")
+const { words, lang, alphabet } = require("./gematria")
 
 // Utility function for a random number between min and max (inclusive)
 const random = (min, max) => {
@@ -50,6 +50,7 @@ module.exports = { random, choice, shuffle, shuffleWords, ascii, rchar, rbits }
 // Unit testing
 if (require.main != module) return
 log("=============== RANDOM ==============")
+const { lines } = require("./sources")
 
 const { stripVowels } = require("./wheel")
 let L1 = stripVowels(lines("WLC.txt")[0]).trim()
@@ -57,7 +58,8 @@ log(L1)
 log(permuteWords(L1))
 log(shuffleWords("This is an English Sentence!"))
 
-let PG1 = chapter("GE", 1, "WLC").map(l => stripVowels(l).trim()).filter((_, n) => n < 5)
+const { WLC, chapter } = require("./sources")
+let PG1 = chapter("Ge 1", WLC).map(l => stripVowels(l).trim()).filter((_, n) => n < 5)
 
 log("-------- SHUFFLED --------")
 log(PG1.map(shuffleWords).join(''))
