@@ -1,5 +1,5 @@
 'use strict'
-const { log } = require("./core")
+const { argv, log } = require("./core")
 
 /* ======================================================= ATBASH Cipher ======================================================= 
 Atbash is a simple cipher in which one transposes the given key such that the first and last letters are set equivalent, and the
@@ -56,21 +56,24 @@ const atbash = (text, key) => text.toUpperCase().split("").map(c => key[rindex(c
 
 module.exports = { atbash, alphabets }
 
-// Unit testing
 if (require.main != module) return
+
 log("=============== ATBASH ================")
+const { lang, normalize } = require("./gematria")
+let args = argv()
 
-// English for my name
-let eaword = "Michael Schutt"
+if (args.length == 0) {
+    // Hebrew word "Leb Kamai" in Jeremiah enciphered text for "Chasdim" the Chaldeans
+    let haword = "לב קמי"
+    let eaword = "Hello, World!"    
+    let gword = normalize("Ἰησοῦς")
 
-// Hebrew phrase "Leb Kamai" found in Jeremiah
-// which is Atbash enciphered text for "Chasdim" (or Chaldeans)
-let haword = "לב קמי"
+    log(eaword, "=>", atbash(eaword, alphabets.english))
+    log(haword, "=>", atbash(haword, alphabets.hebrew))
+    log(gword, '=>', atbash(gword, alphabets.greek))
 
-const { normalize } = require("./gematria")
-let gword = normalize("Ἰησοῦς")
+} else {
 
-// Display the enciphered words
-log(eaword, "=>", atbash(eaword, alphabets.english))
-log(haword, "=>", atbash(haword, alphabets.hebrew))
-log(gword, '=>', atbash(gword, alphabets.greek))
+    let [ word, key ] = args
+    log(atbash(normalize(word), key || alphabets[lang(word)]))
+}

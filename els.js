@@ -1,6 +1,6 @@
 "use strict"
 const { normalize } = require("./gematria")
-const { log, range, read } = require("./core")
+const { argv, log, range, read } = require("./core")
 const { WLC, KJV, STR, text, book, chapter } = require("./sources")
 
 /* ================== EQUIDISTANT LETTER SEQUENCING ================== 
@@ -108,29 +108,37 @@ const I53 = format(chapter('Isa 53', WLC))
 
 module.exports = { skip, format, G, I53 }
 
-// Unit testing
 if (require.main != module) return
 log("=========== ELS =========")
+let args = argv()
 
-// let terms = ["ACE"]
-// let stext = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-// let seq = sequence(stext)[1].text
-// log(`Term ${terms[0]} found in sequence ${seq.substr(0, 30)}... at index ${find(seq, terms[0])}`)
+if (args.length == 0) {
+    
+    let terms = ["ACE"]
+    let stext = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    let seq = sequence(stext)[1].text
+    log(`Term ${terms[0]} found in sequence ${seq.substr(0, 30)}... at index ${seq.indexOf(terms[0])}`)
+    
+    // GE 1 (5) x 50 = תורה
+    log ('Genesis chapter 1, starting at the 6th letter, skipping every 50 letters:', 
+    skip(G.substr(5), 50).substr(0, 4))
+    log("==============================================")
+    log(search(G.substr(5), 50, "תורה", 38).substr(0, 500))
+    
+    // ISA 53 (507) x 20 = ישוע שמי
+    let IT = reverse(I53.substr(0, 507))
+    log('Isaiah chapter 53, starting at the 508th letter, skpping every 20 letters:', skip(IT, 20).substr(0, 7))
+    log("==============================================")
+    log(search(IT, 20, "ישועשמי", 20).substr(0, 500))
+    
+    let etext = format(chapter('Ge 1', KJV)).substr(0, 1000)
+    log(search(etext, 1, "He", 18).substr(0, 800))
+    
+    let gtext = format(chapter('Mt 1', STR)).substr(0, 200)
+    log(search(gtext, 1, "ΕΓΕΝΝΗΣΕΝ", 18))
 
-// GE 1 (5) x 50 = תורה
-log ('Genesis chapter 1, starting at the 6th letter, skipping every 50 letters:', 
-skip(G.substr(5), 50).substr(0, 4))
-log("==============================================")
-log(search(G.substr(5), 50, "תורה", 38).substr(0, 500))
+} else {
 
-// ISA 53 (507) x 20 = ישוע שמי
-let IT = reverse(I53.substr(0, 507))
-log('Isaiah chapter 53, starting at the 508th letter, skpping every 20 letters:', skip(IT, 20).substr(0, 7))
-log("==============================================")
-log(search(IT, 20, "ישועשמי", 20).substr(0, 500))
-
-let etext = format(chapter('Ge 1', KJV)).substr(0, 1000)
-log(search(etext, 1, "He", 18).substr(0, 800))
-
-let gtext = format(chapter('Mt 1', STR)).substr(0, 200)
-log(search(gtext, 1, "ΕΓΕΝΝΗΣΕΝ", 18))
+    let [source, interval, term, gridWidth] = args
+    log(search(source, parseInt(interval, 10), term, parseInt(gridWidth, 10)))
+}

@@ -19,11 +19,17 @@ const range = (from, to, by=1) => [...Array(to - from + 1).keys()].map((_, i) =>
 // Utility function to sum up an array of numbers
 const sum = xs => xs.reduce((a, b) => a + b, 0)
 
-// Export common functions
-module.exports = { log, read, write, range, sum }
+// Get arguments
+const argv = (...defaults) => { 
+    const args = process.argv.splice(2); 
+    return args.length > 0 ? args : defaults
+}
 
-// Unit testing
+// Export common functions
+module.exports = { log, read, write, range, sum, argv }
+
 if (require.main != module) return
+
 log("=============== CORE ================")
 const { KJV } = require("./sources")
 const { random, choice } = require("./random")
@@ -35,7 +41,7 @@ log({x: 1, y: 2})
 log(range(0, 10))
 log(range(0, 100, 2))
 log(KJV.substr(0, 1000))
-write("test.txt", "This is a test")
 log(sum(range(1,5)))
 log(range(0, 10).map(n => random(0, 1)).join(''))
 log(choice(range(0, 10)))
+log(argv(1, 2))
