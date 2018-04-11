@@ -42,7 +42,10 @@ Therefore, N at index 7 is 'H'
 
 // Predefined Atbash "Alphabets" or keys. 
 // Two are defined for use, the English and Hebrew alphabets, respectively.
-const alphabets = { english: "ABCDEFGHIJKLMNOPQRSTUVWXYZ", hebrew: "אבגדהוזחטיכלמנסעפצקרשת" }
+const alphabets = { 
+    english: "ABCDEFGHIJKLMNOPQRSTUVWXYZ", 
+    hebrew: "אבגדהוזחטיכלמנסעפצקרשת" 
+}
 
 // Calculates the reverse index of a given character c within a given string of text, or key
 const rindex = (c, key) => key.length - key.indexOf(c) - 1
@@ -50,17 +53,19 @@ const rindex = (c, key) => key.length - key.indexOf(c) - 1
 // Formats the given text enciphers or transposes the text character by character using the Atbash cipher using the given key.
 const atbash = (text, key) => text.toUpperCase().split("").map(c => key[rindex(c, key)] || c).join("")
 
-let test = () => {
-    // English for my name
-    let eaword = "Michael Schutt"
+module.exports = { atbash, alphabets }
 
-    // Hebrew phrase "Leb Kamai" found in Jeremiah
-    // which is Atbash enciphered text for "Chasdim" (or Chaldeans)
-    let haword = "לב קמי"
+// Unit testing
+if (require.main != module) return
+log("=============== ATBASH ================")
 
-    // Display the enciphered words
-    log(eaword, "=>", atbash(eaword, alphabets.english))
-    log(haword, "=>", atbash(haword, alphabets.hebrew))
-}
+// English for my name
+let eaword = "Michael Schutt"
 
-module.exports = { atbash, alphabets, test }
+// Hebrew phrase "Leb Kamai" found in Jeremiah
+// which is Atbash enciphered text for "Chasdim" (or Chaldeans)
+let haword = "לב קמי"
+
+// Display the enciphered words
+log(eaword, "=>", atbash(eaword, alphabets.english))
+log(haword, "=>", atbash(haword, alphabets.hebrew))

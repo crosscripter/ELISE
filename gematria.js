@@ -62,14 +62,17 @@ const lang = word => Object.keys(keys).find(k => Object.keys(keys[k]).indexOf(no
 // Main function, given a word, auto detects key to use and calculates the corresponding gematria value.
 const gematria = word => value(word, keys[lang(word)])
 
-let test = () => {
-    let gtext = read("GE1.txt")
-    let verses = gtext.split(/\r\n/g)
-    verses.forEach(v => { log(v.split(/ /g).map(w => `${w} (${gematria(w)})`).join(' '), '=', gematria(v)) })
-    log('==', gematria(gtext))
+module.exports = { gematria, normalize }
 
-    let words = ["JESUS", "יֵשׁוּעַ", "Ἰησοῦς"]
-    words.map(w => log(w, "=", gematria(w)))
-}
+// Unit testing
+if (require.main != module) return
 
-module.exports = { gematria, normalize, test }
+log("============== GEMATRIA ================")
+
+let gtext = read("GE1.txt")
+let verses = gtext.split(/\r\n/g)
+verses.forEach(v => { log(v.split(/ /g).map(w => `${w} (${gematria(w)})`).join(' '), '=', gematria(v)) })
+log('==', gematria(gtext))
+
+let words = ["JESUS", "יֵשׁוּעַ", "Ἰησοῦς"]
+words.map(w => log(w, "=", gematria(w)))

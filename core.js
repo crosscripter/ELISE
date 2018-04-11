@@ -1,8 +1,8 @@
 "use strict"
 
 /* =================================================== Common Helper Functions ================================================== */
-// Wrapper around console.log (mainly for conciseness)
-const log = output => console.log(output.toString())
+// Wrapper around console.log (mainly for conciseness and pretty printing)
+const log = (...outputs) => console.log(...outputs.map(o => typeof(o) == "object" ? JSON.stringify(o) : o))
 
 // Imports the fs read/write file methods
 const { readFileSync, writeFileSync } = require('fs')
@@ -31,3 +31,19 @@ const choice = xs => xs[random(0, xs.length - 1)]
 
 // Export common functions
 module.exports = { log, read, write, range, sum, choice }
+
+// Unit testing
+if (require.main != module) return
+log("=============== CORE ================")
+
+log(1)
+log(1, 2)
+log([1, 2])
+log({x: 1, y: 2})
+log(range(0, 10))
+log(range(0, 100, 2))
+log(read("KJV.txt").substr(0, 1000))
+write("test.txt", "This is a test")
+log(sum(range(1,5)))
+log(range(0, 10).map(n => random(0, 1)).join(''))
+log(choice(range(0, 10)))

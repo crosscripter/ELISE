@@ -1,4 +1,5 @@
 "use strict"
+const { EOL } = require("os")
 const { log, range, read } = require("./core")
 const { normalize } = require("./gematria")
 
@@ -72,7 +73,7 @@ const indicesOf = (text, term) => text
 //     .filter(s => s.indices.length > 0)
 //     .map(s => `Skipping ${s.seq.skip} at ${s.indices} in ${s.indices.map(i => s.seq.text.substr(i - 10, i + 10)).join(',')}`)
 
-const lines = path => read(path).split(/\r\n/g)
+const lines = path => read(path).split(new RegExp(EOL, 'g')) // (\r\n|\r|\n)/g)
 const unpoint = text => text.replace(/[^א-ת]/g, '')
 const unfinalize = text => {
     const finals = {'ך':'כ', 'ם':'מ', 'ן':'נ', 'ף':'פ', 'ץ':'צ'}
@@ -113,29 +114,28 @@ const search = (text, interval, term, width=0) => {
 const G = text(book("GE"))
 const I53 = text(chapter("ISA", 53))
 
-let test = () => {
+module.exports = { skip, lines, matchLines, format, G, I53 }
 
-    let terms = ["ACE"]
-    let stext = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    let seq = sequence(stext)[1].text
-    log(`Term ${terms[0]} found in sequence ${seq.substr(0, 30)}... at index ${find(seq, terms[0])}`)
+// Unit testing
+if (require.main != module) return
+log("=========== ELS =========")
 
-    // GE 1 (5) x 50 = תורה
-    log ('Genesis chapter 1, starting at the 6th letter, skipping every 50 letters:', 
-    skip(G.substr(5), 50).substr(0, 4))
-    log("==============================================")
-    log(search(G.substr(5), 50, "תורה", 38).substr(0, 500))
+let terms = ["ACE"]
+let stext = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+let seq = sequence(stext)[1].text
+log(`Term ${terms[0]} found in sequence ${seq.substr(0, 30)}... at index ${find(seq, terms[0])}`)
 
-    // ISA 53 (507) x 20 = ישוע שמי
-    let IT = reverse(I53.substr(0, 507))
-    log('Isaiah chapter 53, starting at the 508th letter, skpping every 20 letters:', 
-    skip(IT, 20).substr(0, 7))
-    log("==============================================")
-    log(search(IT, 20, "ישועשמי", 20).substr(0, 500))
+// GE 1 (5) x 50 = תורה
+log ('Genesis chapter 1, starting at the 6th letter, skipping every 50 letters:', 
+skip(G.substr(5), 50).substr(0, 4))
+log("==============================================")
+log(search(G.substr(5), 50, "תורה", 38).substr(0, 500))
 
-    let etext = read("KJV.txt").substr(0, 1000)
-    log(search(etext, 3, "NOAH", 18).substr(0, 800))
-}
+// ISA 53 (507) x 20 = ישוע שמי
+let IT = reverse(I53.substr(0, 507))
+log('Isaiah chapter 53, starting at the 508th letter, skpping every 20 letters:', skip(IT, 20).substr(0, 7))
+log("==============================================")
+log(search(IT, 20, "ישועשמי", 20).substr(0, 500))
 
-module.exports = { skip, lines, matchLines, format, test, G, I53 }
-// test()
+let etext = read("KJV.txt").substr(0, 1000)
+log(search(etext, 3, "NOAH", 18).substr(0, 800))

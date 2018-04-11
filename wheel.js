@@ -53,29 +53,30 @@ const ref = verse => verse.replace(/^([A-Z0-9]{2}) (\d+)\:(\d+)(.*)$/gi, "$1 $2:
 const findVerse = (verse, word) => new RegExp(` ${word} `).test(verse) ? ref(verse) : false
 const verseByVersion = (ref, version) => matchLines(lines(`${version}.txt`), new RegExp(ref + ' ', 'i'))
 
-let test = () => {
+module.exports = { wheel }
 
-    log(wheel)
-    log(spoke('HEB'))
-    log(cycle('HEB'))
-    log(spokeBooks(1))
-    log(letterBooks('ב'))
-    log(cycleBooks(3).toString())
-    log(otherSpokeBooks('ROM'))
-    log(bookBySpokeCycle(2, 3))
-    log(bookByLetterCycle('ב', 3))
+// Unit testing
+if (require.main != module) return
+log("=============== BIBLE WHEEL ===========")
 
-    log(verseByVersion('GE 1:1', 'WLC'))
-    log(verseByVersion('GE 1:1', 'KJV'))
+log(wheel)
+log(spoke('HEB'))
+log(cycle('HEB'))
+log(spokeBooks(1))
+log(letterBooks('ב'))
+log(cycleBooks(3).toString())
+log(otherSpokeBooks('ROM'))
+log(bookBySpokeCycle(2, 3))
+log(bookByLetterCycle('ב', 3))
 
-    let hw = stripVowels("בָּרָ֣א")
-    const hvs = lines("WLC.txt").map(l => `${ref(l)}${stripVowels(l)}`)
+log(verseByVersion('GE 1:1', 'WLC'))
+log(verseByVersion('GE 1:1', 'KJV'))
 
-    const mhvs = hvs.map(v => ({h: v, r: findVerse(v, hw)}))
-                    .filter(x => x.r)
-                    .map(x => `${x.h}  ${verseByVersion(x.r, 'KJV')}`)
+let hw = stripVowels("בָּרָ֣א")
+const hvs = lines("WLC.txt").map(l => `${ref(l)}${stripVowels(l)}`)
 
-    log(mhvs)
-}
+const mhvs = hvs.map(v => ({h: v, r: findVerse(v, hw)}))
+                .filter(x => x.r)
+                .map(x => `${x.h}  ${verseByVersion(x.r, 'KJV')}`)
 
-module.exports = { wheel, test }
+log(mhvs)

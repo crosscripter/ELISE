@@ -108,9 +108,15 @@ const correlate = (x, y) => {
     return sab / Math.sqrt(sa2 * sb2)
 }
 
+// Opens the graph up in the default browser and displays output.
+let displayGraph = () => {
+    let start = (process.platform == 'darwin'? 'open': process.platform == 'win32'? 'start': 'xdg-open');
+    require('child_process').exec(`${start} LC.html`);
+}
+
 // This "plots" the data by writing the HNV data list to the "data.js" external javascript file.
 // This data is then passed into the graph template and renders the data visually in HTML.
-const plot = data => { write("data.js", data); log(data); }
+const plot = (data, display=false) => { write("data.js", data); log(data); display ? displayGraph() : null; }
 
 // Convert a list inputs into a HNV data formatted nested array list.
 // Scales the data points using Log(N) and auto-calculates the gematria value
@@ -132,22 +138,25 @@ const toHNVdata = (...inputs) =>
         return `{data:${JSON.stringify(dlist)},label:"${label}"}`
     })}]`
 
-let test = () => {
-    // Test inputs
-    let diameters = [
-        {word: "ירח", trans: "Moon", value: 1738.1},
-        {word: "ארצ", trans: "Earth", value: 6378.137},
-        {word: "שמש", trans: "Sun", value: 1392000.0},
-    ]
 
-    let diametersEng = [
-        {word: "Moon", trans: "Moon", value: 1738.1},
-        {word: "Earth", trans: "Earth", value: 6378.137},
-        {word: "Sun", trans: "Sun", value: 1392000.0}
-    ]
+module.exports = { plot, correlate, mean, logn }
 
-    // Convert inputs to HNV data format and plot
-    plot(toHNVdata(diameters, diametersEng))
-}
+// Unit testing
+if (require.main != module) return
+log("=========== HNV ============")
 
-module.exports = { plot, test }
+// Test inputs
+let diameters = [
+    {word: "ירח", trans: "Moon", value: 1738.1},
+    {word: "ארצ", trans: "Earth", value: 6378.137},
+    {word: "שמש", trans: "Sun", value: 1392000.0},
+]
+
+let diametersEng = [
+    {word: "Moon", trans: "Moon", value: 1738.1},
+    {word: "Earth", trans: "Earth", value: 6378.137},
+    {word: "Sun", trans: "Sun", value: 1392000.0}
+]
+
+// Convert inputs to HNV data format and plot
+plot(toHNVdata(diameters, diametersEng), true)
