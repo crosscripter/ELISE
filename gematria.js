@@ -66,7 +66,6 @@ module.exports = { gematria, normalize }
 
 // Unit testing
 if (require.main != module) return
-
 log("============== GEMATRIA ================")
 
 let gtext = read("GE1.txt")
