@@ -49,6 +49,50 @@ module.exports = { random, choice, shuffle, shuffleWords, ascii, rchar, rbits }
 
 // Unit testing
 if (require.main != module) return
+
+log("-------- MONTE CARLO SIMULATION OF e ---------------")
+
+const trial = () => {
+    let count = 0
+    let sum = 0
+    while (sum < 1) { sum += Math.random(); count++ }
+    return count;
+}
+
+const monteCarlo = n => {
+    let total = 0
+    for (var i = 0; i < n; i++) total += trial()
+    return total / n
+}
+
+const trialF = (sum=0, count=0) => sum < 1 ? trialF(sum + Math.random(), count + 1) : count
+const monteCarloF = n => range(0, n).map(_ => trialF()).reduce((a, b) => a + b, 0) / n
+
+console.time("simulationF")
+let simulatedE = 0
+
+try {
+    simulatedE = monteCarloF(21995)
+} catch (e) {
+    log("Error", e)
+}
+
+log(`
+    Math.E: ${Math.E}
+simulatedF: ${simulatedE}
+`)
+console.timeEnd("simulationF")
+
+console.time("simulation")
+log(`
+    Math.E: ${Math.E}
+ simulated: ${monteCarlo(10000000)}
+`)
+console.timeEnd("simulation")
+return
+
+
+
 log("=============== RANDOM ==============")
 const { lines } = require("./sources")
 
@@ -81,3 +125,5 @@ log('bits:', bits, 'int:', rint)
 
 log('-------- UTF-16 NOISE ----------')
 log(range(0, 100).map(_ => rchar()).join(''))
+
+
