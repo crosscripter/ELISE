@@ -56,6 +56,7 @@ const atbash = (text, key) => text.toUpperCase().split("").map(c => key[rindex(c
 
 module.exports = { atbash, alphabets }
 
+
 if (require.main != module) return
 
 log("=============== ATBASH ================")

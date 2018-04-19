@@ -1,0 +1,19 @@
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+
+.grid {
+  line-height: 1.5;
+  font-family: 'Courier New';  
+  font-size: large;
+  color: #CCC;
+}
+
+.grid b {
+  color: red;
+}

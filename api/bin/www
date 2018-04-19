@@ -1,0 +1,37 @@
+#!/usr/bin/env node
+
+const app = require('../app')
+const debug = require('debug')('api:server')
+const http = require('http')
+
+const normalizePort = val => {
+  let port = parseInt(val, 10)
+  return isNaN(port) ? val : port >= 0 ? port : false;
+}
+
+const port = normalizePort(process.env.PORT || 3000)
+app.set('port', port)
+
+const onError = error => {
+  if (error.syscall !== 'listen') throw error
+  let bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port  
+  let logError = msg => { console.error(bind, msg); process.exit(1); }
+  
+  let errors = {
+    'EACCESS': 'requires elevated privileges',
+    'EADDRINUSE': 'is already in use' 
+  }
+  
+  logError(errors[error.code] || error)
+}
+
+const onListening = () => {
+  let addr = server.address()
+  let bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port
+  debug('Listening on ' + bind)
+}
+
+const server = http.createServer(app)
+server.listen(port)
+      .on('error', onError)
+      .on('listening', onListening)

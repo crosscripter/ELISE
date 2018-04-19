@@ -6,7 +6,7 @@ const { log, read, write } = require("./core")
 
 // const read = path => readFileSync(path, encoding)
 // const write = (path, text) => writeFileSync(path, text, encoding)
-const source = version => read(`./sources/${version}.txt`)
+const source = version => read(`../sources/${version}.txt`)
 
 const KJV = source('KJV')
 const WLC = source('WLC')

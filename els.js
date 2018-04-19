@@ -1,7 +1,7 @@
 "use strict"
 const { normalize } = require("./gematria")
 const { argv, log, range, read } = require("./core")
-const { WLC, KJV, STR, text, book, chapter } = require("./sources")
+const { lines, WLC, KJV, STR, text, book, chapter } = require("./sources")
 
 /* ================== EQUIDISTANT LETTER SEQUENCING ================== 
 Equidistant letter sequencing is the act of skipping equal number of letters
@@ -105,8 +105,19 @@ const search = (text, interval, term, width=0) => {
 
 const G = format(book('Ge', WLC))
 const I53 = format(chapter('Isa 53', WLC))
+const G1 = format(chapter('Ge 1', KJV)).substr(0, 1000)
+const elsSource = source => format(lines(source))
 
-module.exports = { skip, format, G, I53 }
+const sources = { 
+    G,
+    G1,
+    I53,
+    WLC: elsSource(WLC), 
+    KJV: elsSource(KJV), 
+    STR: elsSource(STR)    
+} 
+
+module.exports = { search, skip, format, G, I53, sources }
 
 if (require.main != module) return
 log("=========== ELS =========")
