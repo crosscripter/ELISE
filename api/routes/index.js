@@ -6,7 +6,7 @@ const { search, sources } = require('../../els')
 const { Router } = require('express')
 const router = Router()
 
-router.get('/', (req, res, next) => res.render('index', { title: 'Express' }))
+router.get('/', (req, res, next) => res.render('index', { title: 'ELISE' }))
 router.get('/atbash/:text/:alphabet?', ({params: {text, alphabet}}, res) => res.send(atbash(text, alphabets[alphabet || 'english'])))
 router.get('/gematria/:text', (req, res) => res.send(gematria(req.params.text).toString()))
 
