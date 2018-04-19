@@ -76,5 +76,9 @@ if (args.length == 0) {
 } else {
 
     let [ word, key ] = args
-    log(atbash(normalize(word), key || alphabets[lang(word)]))
+    log('ARGS:', args)
+    let result = atbash(normalize(word), alphabets[key] || alphabets[lang(word)])
+    log('RESULT', result)
+    process.send(result)
+    log('SENT:', result)
 }

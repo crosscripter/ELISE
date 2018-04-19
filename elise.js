@@ -50,17 +50,20 @@ const thisFile = parse(__filename).base
 
 const isModule = file => /\.js$/.test(file) && file != thisFile
 const isMode = module => !["core", "random", "sources"].includes(module)
-const modules = readdirSync(".").filter(isModule).map(m => parse(m).name)
+const modules = readdirSync("../").filter(isModule).map(m => parse(m).name)
 modules.forEach(m => module.exports[m] = require(`./${m}`))
+
+const elise = (mode, ...params) => fork(`../${mode}.js`, params)
+module.exports.elise = elise
 
 if (require.main != module) return
 
 const usage = `usage: $ node elise.js <mode:${modules.map(m => parse(m).name).filter(isMode).join('|')}> <parameters..>`
-let process_argv = ['node', 'elise.js', 'els', "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "2", "ACE", "20"]
+// let process_argv = ['node', 'elise.js', 'els', "ABCDEFGHIJKLMNOPQRSTUVWXYZ", "2", "ACE", "20"]
+let process_argv = ['node', 'elise.js', 'atbash', 'XYZ']
 let [_, __, mode, ...params] = process_argv
 
-if (!modules.includes(mode)) { log(usage); process.exit(1) }
-fork(`${mode}.js`, params)
-
-let test = () => modules.forEach(m => fork(m))
-// test()
+let test = () => modules.forEach(m => elise(m))
+if (mode == 'test') test()
+else if (!modules.includes(mode)) { log(usage); process.exit(1) }
+else elise(mode, ...params)
