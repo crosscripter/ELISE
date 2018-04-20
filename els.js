@@ -1,6 +1,6 @@
 "use strict"
 const { normalize } = require("./gematria")
-const { argv, log, range, read } = require("./core")
+const { argv, log, range, read, last } = require("./core")
 const { lines, WLC, KJV, STR, text, book, chapter } = require("./sources")
 
 /* ================== EQUIDISTANT LETTER SEQUENCING ================== 
@@ -91,6 +91,7 @@ const grid = (text, indices, width=0) => text
     .map((c, n) => ~indices.indexOf(n) ? `[${c}]` : ` ${c} `)
     .map((c, n) => n % width == 0 ? `\n${c}` : c)
     .join('')
+    .substr(0, last(indices.sort((a, b) => a - b)) * 5)
 
 // Runs an ELS search at skip interval given on text given for the term given
 // and returns a text grid of the results.
@@ -124,7 +125,6 @@ log("=========== ELS =========")
 let args = argv()
 
 if (args.length == 0) {
-    
     let terms = ["ACE"]
     let stext = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     let seq = sequence(stext)[1].text
@@ -149,7 +149,10 @@ if (args.length == 0) {
     log(search(gtext, 1, "ΕΓΕΝΝΗΣΕΝ", 18))
 
 } else {
-
-    let [source, interval, term, gridWidth] = args
-    log(search(source, parseInt(interval, 10), term, parseInt(gridWidth, 10)))
+    let [source, start, interval, term] = args
+    let startPos = parseInt(start, 10) || 0;
+    let sourceText = sources[source].substr(startPos)
+    let result = search(sourceText, parseInt(interval, 10), term)
+    result = result.replace(/\[(.*?)\]/g, '<b>$1</b>')
+    process.send({view: 'grid', state: {grid: result}})
 }

@@ -2,7 +2,7 @@
 const encoding = "utf8"
 
 const { EOL } = require("os")
-const { log, read, write } = require("./core")
+const { log, read, write, single, last } = require("./core")
 
 // const read = path => readFileSync(path, encoding)
 // const write = (path, text) => writeFileSync(path, text, encoding)
@@ -11,9 +11,6 @@ const source = version => read(`../sources/${version}.txt`)
 const KJV = source('KJV')
 const WLC = source('WLC')
 const STR = source('STR')
-
-const single = xs => xs[0]
-const last = xs => xs[xs.length - 1]
 
 const unique = list => {
     var r = [];

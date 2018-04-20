@@ -25,8 +25,11 @@ const argv = (...defaults) => {
     return args.length > 0 ? args : defaults
 }
 
+const single = xs => xs[0]
+const last = xs => xs[xs.length - 1]
+
 // Export common functions
-module.exports = { log, read, write, range, sum, argv }
+module.exports = { log, read, write, range, sum, argv, single, last }
 
 if (require.main != module) return
 
@@ -44,4 +47,4 @@ log(KJV.substr(0, 1000))
 log(sum(range(1,5)))
 log(range(0, 10).map(n => random(0, 1)).join(''))
 log(choice(range(0, 10)))
-log(argv(1, 2))
+log(argv())

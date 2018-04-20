@@ -74,11 +74,7 @@ if (args.length == 0) {
     log(gword, '=>', atbash(gword, alphabets.greek))
 
 } else {
-
     let [ word, key ] = args
-    log('ARGS:', args)
     let result = atbash(normalize(word), alphabets[key] || alphabets[lang(word)])
-    log('RESULT', result)
     process.send(result)
-    log('SENT:', result)
 }
