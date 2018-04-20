@@ -63,18 +63,17 @@ log("=============== ATBASH ================")
 const { lang, normalize } = require("./gematria")
 let args = argv()
 
-if (args.length == 0) {
-    // Hebrew word "Leb Kamai" in Jeremiah enciphered text for "Chasdim" the Chaldeans
-    let haword = "לב קמי"
-    let eaword = "Hello, World!"    
-    let gword = normalize("Ἰησοῦς")
-
-    log(eaword, "=>", atbash(eaword, alphabets.english))
-    log(haword, "=>", atbash(haword, alphabets.hebrew))
-    log(gword, '=>', atbash(gword, alphabets.greek))
-
-} else {
+if (args.length > 0) {
     let [ word, key ] = args
     let result = atbash(normalize(word), alphabets[key] || alphabets[lang(word)])
-    process.send(result)
+    return process.send(result)
 }
+
+// Hebrew word "Leb Kamai" in Jeremiah enciphered text for "Chasdim" the Chaldeans
+let haword = "לב קמי"
+let eaword = "Hello, World!"    
+let gword = normalize("Ἰησοῦς")
+
+log(eaword, "=>", atbash(eaword, alphabets.english))
+log(haword, "=>", atbash(haword, alphabets.hebrew))
+log(gword, '=>', atbash(gword, alphabets.greek))

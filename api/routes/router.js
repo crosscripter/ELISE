@@ -20,9 +20,11 @@ const route = (action, mode, ...params) => router.get(
 
 const textRoute = route.bind(this, (res, msg) => res.send(msg.toString()))
 const renderRoute = route.bind(this, (res, msg) => res.render(msg.view, msg.state))
+const redirectRoute = route.bind(this, (res, msg) => res.redirect(msg))
 
 textRoute('atbash', 'text', 'alphabet?')
 textRoute('gematria', 'text')
 renderRoute('els', 'source', 'start', 'interval', 'term')
+redirectRoute('hnv', 'words', 'trans', 'unit', 'values')
 
 module.exports = router;

@@ -67,21 +67,20 @@ const gematria = word => value(word, keys[lang(word)])
 
 module.exports = { gematria, normalize, words, alphabet, lang }
 
-// Unit testing
+
 if (require.main != module) return
 log("============== GEMATRIA ================")
 let args = argv()
 
-if (args.length == 0) {
-    const { chapter, text, WLC } = require("./sources")
-
-    let verses = chapter('Ge 1', WLC).map(text)
-    verses.forEach(v => log(words(v).map(w => `${w} (${gematria(w)})`).join(' '), '=', gematria(v)))
-    log('TOTAL: ', gematria(verses.join('')))
-
-    let ws = ["JESUS", "יֵשׁוּעַ", "Ἰησοῦς"]
-    ws.map(w => log(w, "=", gematria(w)))
-} else {
+if (args.length > 0) {
     let [ word ] = args
-    process.send(gematria(word))
+    return process.send(gematria(word))
 }
+
+const { chapter, text, WLC } = require("./sources")
+let verses = chapter('Ge 1', WLC).map(text)
+verses.forEach(v => log(words(v).map(w => `${w} (${gematria(w)})`).join(' '), '=', gematria(v)))
+log('TOTAL: ', gematria(verses.join('')))
+
+let ws = ["JESUS", "יֵשׁוּעַ", "Ἰησοῦς"]
+ws.map(w => log(w, "=", gematria(w)))

@@ -1,5 +1,5 @@
 "use strict"
-const { log, write, sum } = require("./core")
+const { argv, log, write, sum } = require("./core")
 const { gematria } = require("./gematria")
 
 /* ================== LOG(N) HNV LINEAR CORRELATION ================== 
@@ -111,12 +111,12 @@ const correlate = (x, y) => {
 // Opens the graph up in the default browser and displays output.
 let displayGraph = () => {
     let start = (process.platform == 'darwin'? 'open': process.platform == 'win32'? 'start': 'xdg-open');
-    require('child_process').exec(`${start} ./output/graph.html`);
+    require('child_process').exec(`${start} ../output/graph.html`);
 }
 
 // This "plots" the data by writing the HNV data list to the "data.js" external javascript file.
 // This data is then passed into the graph template and renders the data visually in HTML.
-const plot = (data, display=false) => { write("./output/hnv-data.js", data); log(data); display ? displayGraph() : null; }
+const plot = (data, display=false) => { write("../output/hnv-data.js", data); log(data); display ? displayGraph() : null; }
 
 // Convert a list inputs into a HNV data formatted nested array list.
 // Scales the data points using Log(N) and auto-calculates the gematria value
@@ -144,6 +144,23 @@ module.exports = { plot, correlate, mean, logn }
 // Unit testing
 if (require.main != module) return
 log("=========== HNV ============")
+let args = argv()
+
+if (args.length > 0) {
+    let [wordList, tranList, unit, valueList] = args
+    let words = wordList.split(',')
+    let trans = tranList.split(',')
+    let values = valueList.split(',')
+
+    let inputs = [
+        [{word: words[0], trans: trans[0], value: values[0]},
+         {word: words[1], trans: trans[1], value: values[1]},
+         {word: words[2], trans: trans[2], value: values[2]}]
+    ]
+
+    plot(toHNVdata(...inputs))
+    return process.send('/graph.html')
+}
 
 // Test inputs
 let diameters = [
@@ -159,4 +176,5 @@ let diametersEng = [
 ]
 
 // Convert inputs to HNV data format and plot
-plot(toHNVdata(diameters, diametersEng))
+plot(toHNVdata(diameters, diametersEng), false)
+
