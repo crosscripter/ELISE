@@ -1,0 +1,27 @@
+{
+    "name": "ORIGIN",
+    "children": [
+        {"name": "A3","children": [{"name": "A2", "children": [{"name": "A1", "children": [{"name": "A", "size": 1}] }]}]},
+        {"name": "B3","children": [{"name": "B2", "children": [{"name": "B1", "children": [{"name": "B", "size": 1}] }]}]},
+        {"name": "C3","children": [{"name": "C2", "children": [{"name": "C1", "children": [{"name": "C", "size": 1}] }]}]},
+        {"name": "D3","children": [{"name": "D2", "children": [{"name": "D1", "children": [{"name": "D", "size": 1}] }]}]},
+        {"name": "E3","children": [{"name": "E2", "children": [{"name": "E1", "children": [{"name": "E", "size": 1}] }]}]},
+        {"name": "F3","children": [{"name": "F2", "children": [{"name": "F1", "children": [{"name": "F", "size": 1}] }]}]},
+        {"name": "G3","children": [{"name": "G2", "children": [{"name": "G1", "children": [{"name": "G", "size": 1}] }]}]},
+        {"name": "H3","children": [{"name": "H2", "children": [{"name": "H1", "children": [{"name": "H", "size": 1}] }]}]},
+        {"name": "I3","children": [{"name": "I2", "children": [{"name": "I1", "children": [{"name": "I", "size": 1}] }]}]},
+        {"name": "J3","children": [{"name": "J2", "children": [{"name": "J1", "children": [{"name": "J", "size": 1}] }]}]},
+        {"name": "K3","children": [{"name": "K2", "children": [{"name": "K1", "children": [{"name": "K", "size": 1}] }]}]},
+        {"name": "L3","children": [{"name": "L2", "children": [{"name": "L1", "children": [{"name": "L", "size": 1}] }]}]},
+        {"name": "M3","children": [{"name": "M2", "children": [{"name": "M1", "children": [{"name": "M", "size": 1}] }]}]},
+        {"name": "N3","children": [{"name": "N2", "children": [{"name": "N1", "children": [{"name": "N", "size": 1}] }]}]},
+        {"name": "O3","children": [{"name": "O2", "children": [{"name": "O1", "children": [{"name": "O", "size": 1}] }]}]},
+        {"name": "P3","children": [{"name": "P2", "children": [{"name": "P1", "children": [{"name": "P", "size": 1}] }]}]},
+        {"name": "Q3","children": [{"name": "Q2", "children": [{"name": "Q1", "children": [{"name": "Q", "size": 1}] }]}]},
+        {"name": "R3","children": [{"name": "R2", "children": [{"name": "R1", "children": [{"name": "R", "size": 1}] }]}]},
+        {"name": "S3","children": [{"name": "S2", "children": [{"name": "S1", "children": [{"name": "S", "size": 1}] }]}]},
+        {"name": "T3","children": [{"name": "T2", "children": [{"name": "T1", "children": [{"name": "T", "size": 1}] }]}]},
+        {"name": "U3","children": [{"name": "U2", "children": [{"name": "U1", "children": [{"name": "U", "size": 1}] }]}]},
+        {"name": "V3","children": [{"name": "V2", "children": [{"name": "V1", "children": [{"name": "V", "size": 1}] }]}]}
+   ]
+}

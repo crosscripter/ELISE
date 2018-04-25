@@ -50,7 +50,7 @@ const unaccent = text => text.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
 const clean = text => text.replace(/[^A-ZΑ-Ωא-ת]/g, '')
 
 // Normalizes text by cleaning and unaccenting the text given.
-const normalize = text => clean(unaccent(text.toUpperCase()))
+const normalize = text => unescape(clean(unaccent(text.toUpperCase())))
 
 // Split a given text up by words
 const words = text => text.split(' ').filter(x => x)
