@@ -155,3 +155,6 @@ log(search(etext, 1, "He", 18).substr(0, 800))
 
 let gtext = format(chapter('Mt 1', STR)).substr(0, 200)
 log(search(gtext, 1, "ΕΓΕΝΝΗΣΕΝ", 18))
+
+log("===========")
+log(G1.toUpperCase())

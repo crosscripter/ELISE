@@ -47,10 +47,10 @@ const unaccent = text => text.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
 
 // Cleans all characters from text that are not Greek, Hebrew or Latin letters
 // Removes vowel points and grammatical marks in addition as well.
-const clean = text => text.replace(/[^A-ZΑ-Ωא-ת]/g, '')
+const clean = text => text.replace(/[^A-ZΑ-Ωא-ת]/gi, '')
 
 // Normalizes text by cleaning and unaccenting the text given.
-const normalize = text => unescape(clean(unaccent(text.toUpperCase())))
+const normalize = (text, recase=true) => unescape(clean(unaccent(recase ? text.toUpperCase() : text)))
 
 // Split a given text up by words
 const words = text => text.split(' ').filter(x => x)
@@ -84,3 +84,4 @@ log('TOTAL: ', gematria(verses.join('')))
 
 let ws = ["JESUS", "יֵשׁוּעַ", "Ἰησοῦς"]
 ws.map(w => log(w, "=", gematria(w)))
+log(normalize("Ἰησοῦς", false))

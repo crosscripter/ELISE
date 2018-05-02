@@ -14,17 +14,29 @@ let b2s = bits => ba(bits).map(b2c).join('')
 let cop = (c, op) => i2c(op(c2i(c)))
 let sop = (s, op) => s.split('').map(c => cop(c, op)).join('')
 
-module.exports = { sop, b2s, s2b, c2b, b2c }
+const bitClass = bit => bit == '0' ? 'zero' : 'one'
+const bitPixel = bit => `<div class='bit ${bitClass(bit)}'></div>`
+const bitDivs = text => text.split('').map(bitPixel).join('')
+
+const bitStyle = '<style>body{color:#000;}form{margin:10px 0;}.bit{float:left;width:8px;height:8px;border:1px solid transparent;-webkit-transition:border 500ms ease-out;-moz-transition:border 500ms ease-out;-o-transition:border 500ms ease-out;}.one{background:#000;}</style>'
+const bitScript = '<script>$(function(){$("#toggleBorder").click(function(){var on=$(this).prop("checked");$(".bit").css("border", on ? "1px solid #eee":"1px solid transparent");});});</script>'
+const bitControls = "<form><input type='checkbox' id='toggleBorder'><label for='toggleBorder'>Show Pixels</label></form>"
+const bitHtml = text => `<!doctype html><html><head>${bitStyle}<script src="https://code.jquery.com/jquery.min.js"></script></head><body>${bitControls}<div id='bitImage'>${bitDivs(text)}</div>${bitScript}</body></html>`
+
+module.exports = { sop, b2s, s2b, c2b, b2c, bitHtml }
 
 // Unit testing
 if (require.main != module) return
 log("=========== BIN ============")
+const { write } = require("./core")
+const { normalize } = require("./gematria")
 let args = argv()
 
-if (args.length > 0) {
-    let { text, offset } = args
-    let result = sop(args, n => n + offset)
-    return process.send(result)
+if (args.length > 0) {    
+    let [ text ] = args
+    let result = bitHtml(s2b(normalize(text, false))) // sop(args, n => n + offset)
+    write("../output/bits.html", result)
+    return process.send(`/bits.html?text=${text}`)
 }
 
 const { KJV, verse, text } = require("./sources")
@@ -40,3 +52,6 @@ log('===========================================')
 log(r)
 log(s2b(r))
 log(strip(r))
+
+let html = bitHtml(b)
+write("../output/bits.html", html)

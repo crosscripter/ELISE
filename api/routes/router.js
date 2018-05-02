@@ -26,5 +26,6 @@ textRoute('atbash', 'text', 'alphabet?')
 textRoute('gematria', 'text')
 renderRoute('els', 'source', 'start', 'interval', 'term')
 redirectRoute('hnv', 'words', 'trans', 'unit', 'values')
+redirectRoute('bin', 'text')
 
 module.exports = router;
