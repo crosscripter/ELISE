@@ -65,8 +65,9 @@ let args = argv()
 
 if (args.length > 0) {
     let [ word, key ] = args
-    let result = atbash(normalize(word), alphabets[key] || alphabets[lang(word)])
-    return process.send(result)
+    key = alphabets[key] || alphabets[lang(word)]
+    let result = atbash(normalize(word), key)
+    return process.send({text: result, key: key})
 }
 
 // Hebrew word "Leb Kamai" in Jeremiah enciphered text for "Chasdim" the Chaldeans
