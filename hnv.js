@@ -158,8 +158,9 @@ if (args.length > 0) {
          {word: words[2], trans: trans[2], value: values[2]}]
     ]
 
-    plot(toHNVdata(...inputs))
-    return process.send('/graph.html')
+    let data = toHNVdata(...inputs)
+    plot(data)
+    return process.send({url: '/graph.html', inputs, data})
 }
 
 // Test inputs

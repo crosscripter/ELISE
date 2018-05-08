@@ -15,7 +15,7 @@ const random = (min, max) => {
 const choice = xs => xs[random(0, xs.length - 1)]
 
 // Generate a random string of text a given length using the key provided.
-const rstring = (length, key) => range(1, length).map(_ => choice(key.split(''))).join('')
+const rstring = (length, key) => range(1, length).map(_ => choice(key.chars())).join('')
 
 // Shuffles a list of items into a random order
 const shuffle = list => {

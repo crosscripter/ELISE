@@ -2,10 +2,9 @@
 const { log, range } = require("./core")
 const { alphabets } = require("./atbash")
 const { lines, verse, books, WLC, KJV } = require("./sources")
-// const { lines, matchLines } = require("./els")
 
 /* ================== BIBLE WHEEL ================== */
-const letters = alphabets.hebrew.split('')
+const letters = alphabets.hebrew.chars()
 
 const wheel = range(0, 65).map(n => ({
     number: n + 1, 
@@ -43,7 +42,16 @@ module.exports = { wheel, stripVowels }
 
 // Unit testing
 if (require.main != module) return
+
 log("=============== BIBLE WHEEL ===========")
+
+const { argv } = require("./core")
+const args = argv()
+
+if (args.length > 0) {
+    log(args)
+    return process.send({args})
+}
 
 log(wheel)
 log(spoke('Heb'))

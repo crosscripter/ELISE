@@ -1,32 +1,252 @@
 'use strict'
+
+/* ================================= BINARY BIT IMAGING ========================================== */
 const { argv, log } = require("./core")
 
-let zpad = b => Array(Math.abs(8 - b.length)).fill('0').join('') + b
-let c2i = c => c.codePointAt(0)
+
+
+/* string zpad(string bits)
+Summary: Zero pads a string of bits to be 8 bit long, left padding with zeros.
+Returns: A string of 8 bits left padded with zero characters.
+Example: 
+> zpad('101')
+'00000101'
+*/
+const zpad = b => Array(Math.abs(8 - b.length)).fill('0').join('') + b
+
+
+/* int c2i(char c)
+Summary: Converts a given character c into it's equivalent character code as an int.
+Returns: The character's unicode code point as an int.
+Example:
+> c2i('A')
+65
+*/
+const c2i = c => c.codePointAt(0)
+
+
+/* string i2b(int i)
+Summary: Converts an integer to it's equivalent binary representation.
+Returns: The equivalent binary bits as a byte string (8 bits, 1 or 0s) zero-padded
+Example: 
+> i2b(3)
+'00000011'
+*/
 let i2b = i => zpad(i.toString(2), 8)
+
+
+/* char i2c(int i)
+Summary: Converts a given integer i into it's equivalent UTF8 encoded Unicode character.
+Returns: The equivalent UTF8 encoded Unicode character as a string.
+Note: The integer is made absolute before conversion!
+
+Example:
+> i2c(65)
+'A'
+*/
 let i2c = i => String.fromCodePoint(Math.abs(i))
+
+
+/* string c2b(char c)
+Summary: Converts a given character c into a binary byte string.
+Returns: The equivalent byte string for the given character as a string.
+Example:
+> c2b('A')
+'10000001'
+*/
 let c2b = c => i2b(c2i(c))
-let s2b = s => s.split('').map(c2b).join('')
+
+
+/* string s2b(string s)
+Summary: Converts a given string s into the equivalent byte string.
+Returns: A binary byte string for each character in the string as a byte string.
+Example:
+> s2b('ABC')
+'100000011000001010000011'
+*/
+let s2b = s => s.map(c2b).join('')
+
+
+/* string[] ba(string bs)
+Summary: Converts a given binary string into an array of byte strings
+Returns: A byte array of all byte strings contained in the original binary string.
+Example:
+> ba('100000011000001010000011')
+['10000001','10000010','10000011']
+*/
 let ba = bs => bs.split(/([01]{8})/g).filter(x => x)
+
+
+/* int b2i(string b)
+Summary: Converts the byte string b into the equivalent integer representation.
+Returns: The integer value represented by the given byte string.
+Example:
+> b2i('00000011')
+3
+*/
 let b2i = b => parseInt(b, 2)
+
+
+/* char b2c(string b)
+Summary: Converts the byte string b into the equivalent character representation.
+Returns: The equivalent UTF8 encoded Unicode charcter for the given byte string.
+Example:
+> b2c('10000001')
+'A'
+*/
 let b2c = b => i2c(b2i(b))
+
+
+/* string b2s(string bits)
+Summary: Converts the given binary string into a string of equivalent characters.
+Returns: A equivalent string of UTF8 encoded Unicode characters for the given binary string.
+Example:
+> b2s('100000011000001010000011')
+'ABC'
+*/
 let b2s = bits => ba(bits).map(b2c).join('')
+
+
+/* char cop(char c, char op(char))
+Summary: Applies an binary/arithemetic operation/function to a given character's value and returns the resulting character.
+Returns: The resulting character based on the resulting value of the given operation applied to the original character's value as a string.
+Example:
+> cop('A', c => c + 1)
+'B'
+
+'A' => 65
+65 + 1 = 66
+66 => 'B'
+*/
 let cop = (c, op) => i2c(op(c2i(c)))
-let sop = (s, op) => s.split('').map(c => cop(c, op)).join('')
 
+
+/* sop(string s, char op(char))
+Summary: Applies an binary/arithmetic operation/function to each character in the given string and returns the resulting string.
+Returns: The resulting string based on the resulting values of the given operations applied to the original character values as a string.
+Example:
+> sop('ABC', c => c + 1)
+'BCD'
+*/
+let sop = (s, op) => s.map(c => cop(c, op)).join('')
+
+
+/* string bitClass(char bit)
+Summary: Returns the equivalent css class name (zero or one) for the given bit character (0 or 1).
+Returns: The equivalent css class name of the given bit character as a string.
+Example:
+> bitClass('1')
+'one'
+> bitClass('0')
+'zero'
+*/
 const bitClass = bit => bit == '0' ? 'zero' : 'one'
-const bitPixel = bit => `<div class='bit ${bitClass(bit)}'></div>`
-const bitDivs = text => text.split('').map(bitPixel).join('')
 
-const bitStyle = '<style>body{color:#000;}form{margin:10px 0;}.bit{float:left;width:8px;height:8px;border:1px solid transparent;-webkit-transition:border 500ms ease-out;-moz-transition:border 500ms ease-out;-o-transition:border 500ms ease-out;}.one{background:#000;}</style>'
-const bitScript = '<script>$(function(){$("#toggleBorder").click(function(){var on=$(this).prop("checked");$(".bit").css("border", on ? "1px solid #eee":"1px solid transparent");});});</script>'
-const bitControls = "<form><input type='checkbox' id='toggleBorder'><label for='toggleBorder'>Show Pixels</label></form>"
-const bitHtml = text => `<!doctype html><html><head>${bitStyle}<script src="https://code.jquery.com/jquery.min.js"></script></head><body>${bitControls}<div id='bitImage'>${bitDivs(text)}</div>${bitScript}</body></html>`
+
+/* string bitPixel(char bit)
+Summary: Converts a given bit character (0 or 1) into a "bit pixel" classed html div element
+Returns: Returns a "bit pixel" classed html div element for a given bit character (0 or 1).
+Example:
+> bitPixel('1')
+"<div class='bit one'></div>"
+> bitPixel('0')
+"<div class='bit zero'></div>"
+*/
+const bitPixel = bit => `<div class='bit ${bitClass(bit)}'></div>`
+
+
+/* string bitDivs(string text)
+Summary: Converts a given binary string into the equivalent bit pixeled HTML divs.
+Returns: A string of HTML divs generated by bitPixeling each character in the text.
+Example:
+> bitDivs('101')
+"<div class='bit one'></div><div class='bit zero'></div><div class='bit one'></div>"
+*/
+const bitDivs = text => text.map(bitPixel).join('')
+
+
+// TODO: Move this into the actual view instead?
+/* string bitStyle
+Summary: The constant shared css styles for all bits and the UI related to the HTML view for binary
+*/
+const bitStyle = `
+<style>
+    body {
+        color:#000;
+    }
+
+    form {
+        margin: 10px 0;
+    }
+
+    .bit {
+        float: left;
+        width: 8px;
+        height: 8px;
+        border: 1px solid transparent;
+        -webkit-transition: border 500ms ease-out;
+        -moz-transition: border 500ms ease-out;
+        -o-transition: border 500ms ease-out;
+    }
+
+    .one {
+        background: #000;
+    }
+</style>`
+
+
+// TODO: Move this out to the actual view?
+/* string bitScript
+Summary: The constant shared scripts for the UI related to the HTML view for binary
+*/
+const bitScript = `
+<script>
+    $(function() {
+        $("#toggleBorder").click(function() {
+            var on = $(this).prop("checked");
+            $(".bit").css("border", on ? "1px solid #eee" : "1px solid transparent");
+        });
+    });
+</script>`
+
+
+/* string bitControls
+Summary: The constant shared controls for the UI related to the HTML view for binary
+*/
+const bitControls = `
+<form>
+    <input type='checkbox' id='toggleBorder'>
+    <label for='toggleBorder'>Show Pixels</label>
+</form>`
+
+
+/* string bitHtml
+Summary: The constant shared HTML template for the UI related to the HTML view for binary
+*/
+const bitHtml = text => `
+<!doctype html>
+<html>
+    <head>
+        ${bitStyle}
+        <script src="https://code.jquery.com/jquery.min.js"></script>
+    </head>
+    <body>
+        ${bitControls}
+        <div id='bitImage'>
+            ${bitDivs(text)}
+        </div>
+        ${bitScript}
+    </body>
+</html>`
+
+
 
 module.exports = { sop, b2s, s2b, c2b, b2c, bitHtml }
 
-// Unit testing
+
+
 if (require.main != module) return
+
 log("=========== BIN ============")
 const { write } = require("./core")
 const { normalize } = require("./gematria")
@@ -34,9 +254,11 @@ let args = argv()
 
 if (args.length > 0) {    
     let [ text ] = args
-    let result = bitHtml(s2b(normalize(text, false))) // sop(args, n => n + offset)
-    write("../output/bits.html", result)
-    return process.send(`/bits.html?text=${text}`)
+    let bits = s2b(normalize(text, false))
+    let output =  bitHtml(bits)
+    let html = bitDivs(bits)
+    write("../output/bits.html", output)
+    return process.send({url: '/bits.html', bits, html})
 }
 
 const { KJV, verse, text } = require("./sources")
@@ -55,3 +277,4 @@ log(strip(r))
 
 let html = bitHtml(b)
 write("../output/bits.html", html)
+log(html)

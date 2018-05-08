@@ -1,5 +1,4 @@
 'use strict'
-const { argv, log } = require("./core")
 
 /* ======================================================= ATBASH Cipher ======================================================= 
 Atbash is a simple cipher in which one transposes the given key such that the first and last letters are set equivalent, and the
@@ -40,19 +39,70 @@ Therefore, N at index 7 is 'H'
 */
 
 
-// Predefined Atbash "Alphabets" or keys. 
-// Two are defined for use, the English and Hebrew alphabets, respectively.
-const alphabets = { 
-    english: "ABCDEFGHIJKLMNOPQRSTUVWXYZ", 
+
+
+const { argv, log } = require("./core")
+
+
+
+// Predefined Atbash "Alphabets" or keys. Two are defined for use, the English and Hebrew alphabets, respectively.
+const alphabets = {
+
+    // English (Latin) alphabet A - Z
+    english: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+
+    // Hebrew Alefbet א-ת (Alef-Tav)
     hebrew: "אבגדהוזחטיכלמנסעפצקרשת",
+
+    // Greek alphabeta Α-Ω (Alpha-Omega)
     greek: "ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ"
 }
 
-// Calculates the reverse index of a given character c within a given string of text, or key
-const rindex = (c, key) => key.length - key.indexOf(c) - 1
 
-// Formats the given text enciphers or transposes the text character by character using the Atbash cipher using the given key.
-const atbash = (text, key) => text.toUpperCase().split("").map(c => key[rindex(c, key)] || c).join("")
+/** int rindex(char char, string string)
+Summary: Calculates the reverse index of a given character within a given string of text.
+Returns: The reverse index of the character in the string from the end instead as an int.
+
+Example: 
+> rindex('E', "ABCDEFG")
+2
+
+Equation:
+R = (L - I) - 1
+
+Where L is the length of the string
+      I is the zero-based forward index of the character
+      R is the zero-based reverse index of the character
+
+Given the index of 'E' is 4
+
+Index:   0 1 2 3 4 5 6
+Chars:   A B C D E F G
+RIndex:  6 5 4 3 2 1 0
+
+Therefore a string having the length of 7 (L)
+minus the forward index of 'E' at 4 (I) is 3
+minus the offset of 1 or 2 the reverse index (R) of 'E'
+
+L = 7
+I = 4
+R = (7 - 4) - 1
+R = (3) - 1
+R = 2
+*/
+const rindex = (char, string) => (string.length - string.indexOf(char)) - 1
+
+
+/** string atbash(string text, string key)
+Summary: Formats the given text enciphers or transposes the text character by character using the Atbash cipher using the given alphabetic key.
+Returns: The atbashed enciphered text as a string
+
+Example:
+> atbash('ABC', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+'ZYX'
+*/
+const atbash = (text, key) => text.toUpperCase().map(c => key[rindex(c, key)] || c).join("")
+
 
 module.exports = { atbash, alphabets }
 
@@ -64,16 +114,18 @@ const { lang, normalize } = require("./gematria")
 let args = argv()
 
 if (args.length > 0) {
-    let [ word, key ] = args
-    let result = atbash(normalize(word), alphabets[key] || alphabets[lang(word)])
-    return process.send(result)
+    let [ word, keyname ] = args
+    let key = alphabets[keyname] || alphabets[lang(word)]
+    log(`word='${word}', key='${key}'`)
+    let result = atbash(normalize(word), key)
+    return process.send({text: result, key: key})
 }
 
-// Hebrew word "Leb Kamai" in Jeremiah enciphered text for "Chasdim" the Chaldeans
-let haword = "לב קמי"
-let eaword = "Hello, World!"    
-let gword = normalize("Ἰησοῦς")
+let words = {
+    // Hebrew word "Leb Kamai" in Jeremiah enciphered text for "Chasdim" the Chaldeans
+    hebrew: "לב קמי",
+    english: "Hello, World!",
+    greek: "Ἰησοῦς"
+}
 
-log(eaword, "=>", atbash(eaword, alphabets.english))
-log(haword, "=>", atbash(haword, alphabets.hebrew))
-log(gword, '=>', atbash(gword, alphabets.greek))
+words.map((k, v) => log(v, '=>', atbash(normalize(v), alphabets[k])))

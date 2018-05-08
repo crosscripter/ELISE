@@ -49,18 +49,17 @@ verify them.
 */
 
 // Utility function to reverse a string of text
-const reverse = text => text.split('').reverse().join('')
+const reverse = text => text.chars().reverse().join('')
 
 // Skips a given number of letters (skip) in a given text building a skip text sequence.
-const skip = (text, skip) => text.split('').filter((_, n) => n % skip == 0).join('')
+const skip = (text, skip) => text.chars().filter((_, n) => n % skip == 0).join('')
 
 // Runs the skip sequence for a possible skips on a given text
 // returns a list of sequences in the form {skip, text}
 const sequence = text => range(1, text.length - 1).map(n => ({skip: n, text: skip(text, n)}))
 
 // Calculates all indices of a given term in a given text
-const indicesOf = (text, term) => text
-    .split('')
+const indicesOf = (text, term) => text    
     .map((_, n) => text.substr(n))
     .map((s, n) => s.substr(0, term.length) == term ? n : -1)
     .filter(x => x != -1)
@@ -80,18 +79,17 @@ const unfinalize = text => {
 const format = lines => lines.map(l => unfinalize(text(l))).map(normalize).join('')
 
 // Calculates the all the letter indices of a given word at a given index with a given skip.
-const skipIndices = (word, index, skip) => word.split('').map((_, n) => (n + index) * skip)
+const skipIndices = (word, index, skip) => word.map((_, n) => (n + index) * skip)
 
 // Flattens an array of arrays into a single array
 const flatten = aas => aas.reduce((a, b, _, r) => a.concat(...b), [])
 
 // Produces a text grid with highlighted letters at the given indices of a given width.
-const grid = (text, indices, width=0) => text
-    .split('')
-    .map((c, n) => ~indices.indexOf(n) ? `[${c}]` : ` ${c} `)
-    .map((c, n) => n % width == 0 ? `\n${c}` : c)
-    .join('')
-    .substr(0, last(indices.sort((a, b) => a - b)) * 5)
+const grid = (text, indices, width=0) => 
+    text.map((c, n) => ~indices.indexOf(n) ? `[${c}]` : ` ${c} `)
+        .map((c, n) => n % width == 0 ? `\n${c}` : c)
+        .join('')
+        .substr(0, last(indices.sort((a, b) => a - b)) * 5)
 
 // Runs an ELS search at skip interval given on text given for the term given
 // and returns a text grid of the results.

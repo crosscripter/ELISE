@@ -57,7 +57,7 @@ const words = text => text.split(' ').filter(x => x)
 
 // Calculate the gematria value of a given word based on the given key.
 // NOTE: All letters not found in the key are assigned the value 0 by default.
-const value = (word, key) => sum(normalize(word).split('').map(c => key[c] || 0))
+const value = (word, key) => sum(normalize(word).map(c => key[c] || 0))
 
 // Detects the language and corresponding key name based on the word given.
 const lang = word => Object.keys(keys).find(k => Object.keys(keys[k]).indexOf(normalize(word[0])) !== -1)
@@ -74,7 +74,7 @@ let args = argv()
 
 if (args.length > 0) {
     let [ word ] = args
-    return process.send(gematria(word))
+    return process.send({word: word, value: gematria(word)})
 }
 
 const { chapter, text, WLC } = require("./sources")
