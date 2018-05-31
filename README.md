@@ -1,22 +1,11 @@
-```  
-                         ▓█████  ██▓     ██▓  ██████ ▓█████ 
-                         ▓█   ▀ ▓██▒    ▓██▒▒██    ▒ ▓█   ▀ 
-                         ▒███   ▒██░    ▒██▒░ ▓██▄   ▒███   
-                         ▒▓█  ▄ ▒██░    ░██░  ▒   ██▒▒▓█  ▄ 
-                         ░▒████▒░██████▒░██░▒██████▒▒░▒████▒
-                         ░░ ▒░ ░░ ▒░▓  ░░▓  ▒ ▒▓▒ ▒ ░░░ ▒░ ░
-                         ░ ░  ░░ ░ ▒  ░ ▒ ░░ ░▒  ░ ░ ░ ░  ░
-                         ░     ░ ░    ▒ ░░  ░  ░     ░   
-                         ░  ░    ░  ░ ░        ░     ░  ░
-                                                        
-```
-
+#                                       E.L.I.S.E
 ##                                  Version 0.1.0.1
 ###                   (Equidistant Letter Interval Sequencing Engine)
 ####                      Copyright (R) Michael Schutt, 2018-2019
 
 ##                 Usage: ENGINE  $ node elise.js <mode> <parameters...>
 ###                       API     $ cd /elise/api && npm start
+
 
 ## MODES
 
