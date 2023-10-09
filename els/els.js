@@ -1,6 +1,14 @@
-const { log, time, timeEnd } = console
-const { readFileSync } = require('fs')
+const { time, timeEnd } = console
+const { verses } = require('../kjv/kjv')
+const { log } = require('../core/logger')
+const { clean } = require('../core/utils')
 
+/**
+ * 
+ * @param {string} s String of text to sequence
+ * @param {number} n The skip interval to skip (every nth char)
+ * @returns The generated sequence of skipped chars as string
+ */
 const skip = (s, n) => {
     if (n == 1) return s.split('')
     const q = []
@@ -9,19 +17,17 @@ const skip = (s, n) => {
     return q
 }
 
-const clean = s => s.replace(/[^a-z]/gi, '').toUpperCase().trim()
+module.exports = { skip }
+if (require.main !== module) return
 
-const kjv = () => {
-    const text = readFileSync('C:\\users\\cross\\OneDrive\\Documents\\KJV.txt', 'utf8')
-    const lines = text.split(/\r\n|\r|\n/g).filter(Boolean)
-    const verses = lines.map(line => line.replace(/^[\d\w]+ \d+:\d+ (.*?)$/, '$1'))
-    return clean(verses.join(' '))
-}
-
+/* Constants */
 const KJV_LEN = 3_227_581
-const s = kjv() 
+
+// Load KJV
+const s = clean(verses.map(({ text }) => text).join(' '))
 log(`${s.length} character string generated: ${s.substring(0, 100) + '...'}`)
 
+// Search
 const start = 0
 const end = KJV_LEN
 const from = 1
@@ -37,7 +43,6 @@ for (let i = start; i <= end; i++) {
         const lbl = `${n}/${to}@${i}`
         time(lbl)
         const g = skip(ss, n)
-        // console.clear()
         log(g.slice(0, end).join(' '))
         timeEnd(lbl)
         if (g.length <= min) break 
